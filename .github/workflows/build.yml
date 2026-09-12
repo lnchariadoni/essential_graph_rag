@@ -28,13 +28,23 @@ jobs:
     - name: Build and Enforce Complexity Rules
       run: mvn clean verify
 
+    - name: Cache SonarQube packages
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      with:
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar
+        restore-keys: ${{ runner.os }}-sonar
+
+    - name: Cache Maven packages
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+
     # Layer 3: If the build passes, upload analytics to your dashboard
     - name: SonarCloud Deep Audit
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_FOR_GITHUB }}
-      run: |
-        mvn sonar:sonar \
-          -Dsonar.projectKey=lnchariadoni_essential_graph_rag \
-          -Dsonar.organization=lnchariadoni \
-          -Dsonar.host.url=https://sonarcloud.io
+      run: mvn sonar:sonar
