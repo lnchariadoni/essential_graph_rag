@@ -1,4 +1,5 @@
 [![Continuous Integration & Code Analysis](https://github.com/lnchariadoni/essential_graph_rag/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/lnchariadoni/essential_graph_rag/actions/workflows/build.yml)
+[![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-light.svg)](https://sonarcloud.io/summary/new_code?id=lnchariadoni_essential_graph_rag)
 
 ## 🛠️ Quality & Engineering Discipline
 
