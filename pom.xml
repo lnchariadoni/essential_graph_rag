@@ -11,13 +11,15 @@
 
   <properties>
     <maven.compiler.release>25</maven.compiler.release>
-
     <typesafe.config.version>1.4.9</typesafe.config.version>
     <openai.java.client.version>4.58.0</openai.java.client.version>
     <ollama4j.version>1.1.7</ollama4j.version>
     <nejo4j.driver.version>6.2.1</nejo4j.driver.version>
     <pdfbox.version>3.0.8</pdfbox.version>
     <junit.version>6.1.3</junit.version>
+    <sonar.organization>lnchariadoni</sonar.organization>
+    <sonar.projectKey>lnchariadoni_essential_graph_rag</sonar.projectKey>
+    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
   </properties>
 
   <dependencies>
@@ -57,6 +59,7 @@
       <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 
   <build>
@@ -84,6 +87,36 @@
             <mainClass>com.lchari.learning.graph.rag.EssentialGraphRag</mainClass>
         </configuration>
       </plugin>
+
+      <!-- PMD Plugin to enforce complexity thresholds -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>3.28.0</version>
+        <configuration>
+          <failOnViolation>true</failOnViolation>
+          <printFailingErrors>true</printFailingErrors>
+          <rulesets>
+            <ruleset>${project.basedir}/pmd-ruleset.xml</ruleset>
+          </rulesets>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonarsource.scanner.maven</groupId>
+        <artifactId>sonar-maven-plugin</artifactId>
+        <version>5.8.0.7211</version> <!-- Use the latest stable version -->
+      </plugin>
+
     </plugins>
   </build>
 </project>
+

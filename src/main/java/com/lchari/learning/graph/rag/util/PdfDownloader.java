@@ -19,10 +19,7 @@ public final class PdfDownloader {
       return targetPath;
     }
 
-    Path parent = targetPath.toAbsolutePath().getParent();
-    if(parent != null && !Files.exists(parent)) {
-      Files.createDirectories(parent);
-    }
+    createPathIfNotExists(targetPath);
 
     HttpRequest request = HttpRequest.newBuilder()
         .uri(URI.create(url))
@@ -32,11 +29,22 @@ public final class PdfDownloader {
     HttpResponse<Path> response = httpClient.send(request,
         HttpResponse.BodyHandlers.ofFile(targetPath));
 
+    validateResponse(targetPath, response);
+
+    return  targetPath;
+  }
+
+  private static void validateResponse(Path targetPath, HttpResponse<Path> response) throws IOException {
     if(response.statusCode() < 200 || response.statusCode() >= 300) {
       Files.deleteIfExists(targetPath);
       throw new IOException("Failed to download file: " + response.statusCode());
     }
+  }
 
-    return  targetPath;
+  private static void createPathIfNotExists(Path targetPath) throws IOException {
+    Path parent = targetPath.toAbsolutePath().getParent();
+    if(parent != null && !Files.exists(parent)) {
+      Files.createDirectories(parent);
+    }
   }
 }

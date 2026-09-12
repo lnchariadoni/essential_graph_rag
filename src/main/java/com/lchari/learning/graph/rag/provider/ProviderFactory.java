@@ -8,6 +8,7 @@ import com.lchari.learning.graph.rag.provider.openAI.OpenAIEmbeddingProvider;
 import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import io.github.ollama4j.Ollama;
+import java.util.Optional;
 
 public final class ProviderFactory {
   private final AppConfig appConfig;
@@ -35,28 +36,38 @@ public final class ProviderFactory {
   }
 
   private OpenAIClient getOpenAIClient() {
-    if(openAIClient == null) {
-      var builder = OpenAIOkHttpClient.builder().fromEnv();
+    return Optional.ofNullable(openAIClient).orElseGet(this::buildAndGetOpenAIClient);
+  }
 
-      if(appConfig.openAIConfig().baseUrl() != null && !appConfig.openAIConfig().baseUrl().isBlank()) {
-        builder.baseUrl(appConfig.openAIConfig().baseUrl());
-      }
+  private OpenAIClient buildAndGetOpenAIClient() {
+    var builder = OpenAIOkHttpClient.builder().fromEnv();
 
-      if(appConfig.openAIConfig().apiKey() != null && !appConfig.openAIConfig().apiKey().isBlank()) {
-        builder.apiKey(appConfig.openAIConfig().apiKey());
-      }
+    buildBaseURL(builder);
+    buildAPIKey(builder);
 
-      openAIClient = builder.build();
-    }
-
+    openAIClient = builder.build();
     return openAIClient;
   }
 
-  private Ollama getOllamaClient() {
-    if (ollamaClient == null) {
-      ollamaClient = new Ollama(appConfig.ollalamaConfig().baseUrl());
-      ollamaClient.setRequestTimeoutSeconds(appConfig.ollalamaConfig().requestedTimeoutSeconds());
+  private void buildAPIKey(OpenAIOkHttpClient.Builder builder) {
+    if(appConfig.openAIConfig().apiKey() != null && !appConfig.openAIConfig().apiKey().isBlank()) {
+      builder.apiKey(appConfig.openAIConfig().apiKey());
     }
-    return ollamaClient;
+  }
+
+  private void buildBaseURL(OpenAIOkHttpClient.Builder builder) {
+    if(appConfig.openAIConfig().baseUrl() != null && !appConfig.openAIConfig().baseUrl().isBlank()) {
+      builder.baseUrl(appConfig.openAIConfig().baseUrl());
+    }
+  }
+
+  private Ollama getOllamaClient() {
+    return Optional.ofNullable(ollamaClient).orElseGet(
+        () -> {
+          ollamaClient = new Ollama(appConfig.ollalamaConfig().baseUrl());
+          ollamaClient.setRequestTimeoutSeconds(appConfig.ollalamaConfig().requestedTimeoutSeconds());
+          return ollamaClient;
+        }
+    );
   }
 }

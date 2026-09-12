@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<ruleset name="Custom Rules"
+         xmlns="http://sourceforge.net"
+         xmlns:xsi="http://w3.org"
+         xsi:schemaLocation="http://sourceforge.net https://sourceforge.io">
+    <description>Complexity Thresholds</description>
+
+    <rule ref="category/java/design.xml/CyclomaticComplexity">
+        <properties>
+            <!-- A method score above 10 will break the build -->
+            <property name="methodReportLevel" value="6"/>
+        </properties>
+    </rule>
+</ruleset>
