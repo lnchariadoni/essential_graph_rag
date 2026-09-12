@@ -41,7 +41,10 @@ public final class TextChunker {
 
     List<String> chunks = new ArrayList<>();
 
-    for (int start = 0; start < text.length(); ) {
+    int length = text.length();
+    int start = 0;
+
+    while (start < length) {
       int chunkStart = findPreviousWhitespace(text, start, overlap);
       int chunkEnd = findNextWhitespace(text, start, chunkSize);
 
