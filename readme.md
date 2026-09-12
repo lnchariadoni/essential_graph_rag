@@ -1,8 +1,4 @@
-# My Java Concepts Project 🚀
-
-[![Java CI with Maven](https://github.com)](https://github.com)
-[![Quality Gate Status](https://sonarcloud.io)](https://sonarcloud.io)
-[![Complexity](https://sonarcloud.io)](https://sonarcloud.io)
+[![Continuous Integration & Code Analysis](https://github.com/lnchariadoni/essential_graph_rag/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/lnchariadoni/essential_graph_rag/actions/workflows/build.yml)
 
 ## 🛠️ Quality & Engineering Discipline
 
