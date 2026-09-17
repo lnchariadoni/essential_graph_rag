@@ -5,8 +5,8 @@ import com.lchari.learning.graph.rag.model.ChatMessage;
 import com.lchari.learning.graph.rag.model.EmbeddingIndexMetadata;
 import com.lchari.learning.graph.rag.model.RetrievedChunk;
 import com.lchari.learning.graph.rag.neo4j.Neo4jRagRepository;
-import com.lchari.learning.graph.rag.provider.ChatProvider;
-import com.lchari.learning.graph.rag.provider.EmbeddingProvider;
+import com.lchari.learning.graph.rag.provider.chat.ChatProvider;
+import com.lchari.learning.graph.rag.provider.embedding.EmbeddingProvider;
 import java.util.List;
 import java.util.stream.Collectors;
 

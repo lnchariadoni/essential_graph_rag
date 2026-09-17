@@ -1,5 +1,6 @@
 package com.lchari.learning.graph.rag.neo4j;
 
+import com.google.inject.Inject;
 import com.lchari.learning.graph.rag.config.AppConfig;
 import com.lchari.learning.graph.rag.model.EmbeddingIndexMetadata;
 import com.lchari.learning.graph.rag.model.RetrievedChunk;
@@ -20,12 +21,17 @@ public final class Neo4jRagRepository implements AutoCloseable {
   private final Driver neo4jDriver;
   private final QueryConfig queryConfig;
 
-  public Neo4jRagRepository(AppConfig.Neo4jConfig neo4jConfig) {
-    this.neo4jDriver = GraphDatabase.driver(
-        neo4jConfig.url(),
-        AuthTokens.basic(neo4jConfig.username(), neo4jConfig.password())
-    );
+  @Inject
+  public Neo4jRagRepository(AppConfig.Neo4jConfig neo4jConfig, Driver neo4jDriver) {
+//    this.neo4jDriver = GraphDatabase.driver(
+//        neo4jConfig.url(),
+//        AuthTokens.basic(neo4jConfig.username(), neo4jConfig.password())
+//    );
+//
+//    this.queryConfig = QueryConfig.builder().withDatabase(neo4jConfig.database()).build();
+//    this.neo4jDriver.verifyConnectivity();
 
+    this.neo4jDriver = neo4jDriver;
     this.queryConfig = QueryConfig.builder().withDatabase(neo4jConfig.database()).build();
     this.neo4jDriver.verifyConnectivity();
   }

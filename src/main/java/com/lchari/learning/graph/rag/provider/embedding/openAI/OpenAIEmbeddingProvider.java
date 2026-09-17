@@ -1,6 +1,6 @@
-package com.lchari.learning.graph.rag.provider.openAI;
+package com.lchari.learning.graph.rag.provider.embedding.openAI;
 
-import com.lchari.learning.graph.rag.provider.EmbeddingProvider;
+import com.lchari.learning.graph.rag.provider.embedding.EmbeddingProvider;
 import com.openai.client.OpenAIClient;
 import com.openai.models.embeddings.Embedding;
 import com.openai.models.embeddings.EmbeddingCreateParams;

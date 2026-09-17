@@ -1,7 +1,7 @@
-package com.lchari.learning.graph.rag.provider.ollama;
+package com.lchari.learning.graph.rag.provider.chat.ollama;
 
 import com.lchari.learning.graph.rag.model.ChatMessage;
-import com.lchari.learning.graph.rag.provider.ChatProvider;
+import com.lchari.learning.graph.rag.provider.chat.ChatProvider;
 import io.github.ollama4j.Ollama;
 import io.github.ollama4j.models.chat.OllamaChatMessageRole;
 import io.github.ollama4j.models.chat.OllamaChatRequest;

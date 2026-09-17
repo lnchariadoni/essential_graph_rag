@@ -4,23 +4,28 @@ import static com.lchari.learning.graph.rag.util.CustomLogger.printAppConfig;
 import static com.lchari.learning.graph.rag.util.Utils.ingest;
 import static com.lchari.learning.graph.rag.util.Utils.requireCompatibleStoredEmbeddings;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.lchari.learning.graph.rag.chapters.Chapter2;
 import com.lchari.learning.graph.rag.config.AppConfig;
+import com.lchari.learning.graph.rag.model.AppResources;
 import com.lchari.learning.graph.rag.model.EmbeddingIndexMetadata;
-import com.lchari.learning.graph.rag.neo4j.Neo4jRagRepository;
-import com.lchari.learning.graph.rag.provider.ProviderFactory;
+import com.lchari.learning.graph.rag.module.GraphRagModule;
 
 public class EssentialGraphRag {
   static void main() {
-    AppConfig config = AppConfig.load();
+    Injector injector = Guice.createInjector(new GraphRagModule());
+    AppResources appResources = injector.getInstance(AppResources.class);
+
+    AppConfig config =  appResources.getAppConfig();
+
     printAppConfig(config);
 
-    ProviderFactory providerFactory = new ProviderFactory(config);
+    var embeddingProvider = appResources.getEmbeddingProvider();
+    var chatProvider = appResources.getChatProvider();
+    var repository = appResources.getNeo4jRagRepository();
 
-    var embeddingProvider = providerFactory.embeddingProvider(config.embeddingModelProfile());
-    var chatProvider = providerFactory.chatProvider(config.llmModelProfile());
-
-    try(var repository = new Neo4jRagRepository(config.neo4jConfig())) {
+    try {
       EmbeddingIndexMetadata metadata;
 
       if(config.chapter2Config().ingest()) {
