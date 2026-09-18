@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/bin/zsh
 echo "🔍 Running local complexity and build checks..."
 
 # Run Maven verify phase
-mvn clean verify
+mvn clean compile verify
 
 # Check if Maven failed
 if [ $? -ne 0 ]; then

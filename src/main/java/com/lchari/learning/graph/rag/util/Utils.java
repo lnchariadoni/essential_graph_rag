@@ -5,12 +5,15 @@ import com.lchari.learning.graph.rag.model.ChatMessage;
 import com.lchari.learning.graph.rag.model.EmbeddingIndexMetadata;
 import com.lchari.learning.graph.rag.model.RetrievedChunk;
 import com.lchari.learning.graph.rag.neo4j.Neo4jRagRepository;
-import com.lchari.learning.graph.rag.provider.ChatProvider;
-import com.lchari.learning.graph.rag.provider.EmbeddingProvider;
+import com.lchari.learning.graph.rag.provider.chat.ChatProvider;
+import com.lchari.learning.graph.rag.provider.embedding.EmbeddingProvider;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Utils {
+  private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
   private Utils() {}
 
@@ -33,7 +36,7 @@ public class Utils {
         appConfig.chapter2Config().pdfPath());
 
     String text = PdfTextExtractor.extract(pdf);
-    System.out.println("First 50 characters of downloaded file:" + preview(text, 50));
+    logger.info("First 50 characters of downloaded file:[{}]", preview(text, 50));
 
     List<String> chunks = new TextChunker().chunkText(
         text,
@@ -41,7 +44,7 @@ public class Utils {
         appConfig.chapter2Config().chunkOverlap()
     );
 
-    System.out.println(String.format("Generated chunks: %d, first chunk:%s", chunks.size(), chunks.getFirst()));
+    logger.info("Generated chunks: {},\n first chunk:{}", chunks.size(), chunks.getFirst());
 
     List<List<Double>> embeddings = embeddingProvider.getEmbeddings(chunks);
 
@@ -56,10 +59,10 @@ public class Utils {
     }
 
     int dimensions = embeddings.getFirst().size();
-    System.out.println(String.format("Embedding vectors:%d Dimensions:%d First 3 values:%s ",
-        embeddings.size(), dimensions, firstValues(embeddings.getFirst(), 3).toString()));
+    logger.info("Embedding vectors:{} Dimensions:{} First 3 values:{} ",
+        embeddings.size(), dimensions, firstValues(embeddings.getFirst(), 3));
 
-    System.out.println("Writing embeddings as vectors to Nejo4j");
+    logger.info("Writing embeddings as vectors to Nejo4j");
 
     repository.resetChapter2Data(
         appConfig.chapter2Config().vectorIndex(),
@@ -85,12 +88,8 @@ public class Utils {
     repository.saveMetadata(metadata);
 
     var stored = repository.firstChunk();
-    System.out.println("""
-        Stored chunk 0 preview of first 50 letters: %s
-        Stored first 3 embedding values: %s
-        """.formatted(preview(stored.text(), 50),
-        firstValues(stored.embeddings(), 3).toString())
-        );
+    logger.info(" Stored chunk 0 preview of first 50 letters: {}\n Stored first 3 embedding values: {}\n",
+        preview(stored.text(), 50), firstValues(stored.embeddings(), 3));
 
     return metadata;
   }

@@ -1,7 +1,7 @@
-package com.lchari.learning.graph.rag.provider.openAI;
+package com.lchari.learning.graph.rag.provider.chat.openai;
 
 import com.lchari.learning.graph.rag.model.ChatMessage;
-import com.lchari.learning.graph.rag.provider.ChatProvider;
+import com.lchari.learning.graph.rag.provider.chat.ChatProvider;
 import com.openai.client.OpenAIClient;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import java.util.List;

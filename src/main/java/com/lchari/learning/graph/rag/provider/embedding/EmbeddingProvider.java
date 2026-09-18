@@ -1,4 +1,4 @@
-package com.lchari.learning.graph.rag.provider;
+package com.lchari.learning.graph.rag.provider.embedding;
 
 import java.util.List;
 

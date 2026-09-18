@@ -1,6 +1,6 @@
-package com.lchari.learning.graph.rag.provider.ollama;
+package com.lchari.learning.graph.rag.provider.embedding.ollama;
 
-import com.lchari.learning.graph.rag.provider.EmbeddingProvider;
+import com.lchari.learning.graph.rag.provider.embedding.EmbeddingProvider;
 import io.github.ollama4j.Ollama;
 import io.github.ollama4j.models.embed.OllamaEmbedRequest;
 import java.util.List;
