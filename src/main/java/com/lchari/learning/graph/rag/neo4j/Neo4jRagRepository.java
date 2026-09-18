@@ -8,14 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
-import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
-import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.QueryConfig;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Value;
 
-public final class Neo4jRagRepository implements AutoCloseable {
+public final class Neo4jRagRepository {
   private static final Pattern SAFE_IDENTIFIER = Pattern.compile("[A-Za-z_][A-Za-z0-9_]*");
 
   private final Driver neo4jDriver;
@@ -23,14 +21,6 @@ public final class Neo4jRagRepository implements AutoCloseable {
 
   @Inject
   public Neo4jRagRepository(AppConfig.Neo4jConfig neo4jConfig, Driver neo4jDriver) {
-//    this.neo4jDriver = GraphDatabase.driver(
-//        neo4jConfig.url(),
-//        AuthTokens.basic(neo4jConfig.username(), neo4jConfig.password())
-//    );
-//
-//    this.queryConfig = QueryConfig.builder().withDatabase(neo4jConfig.database()).build();
-//    this.neo4jDriver.verifyConnectivity();
-
     this.neo4jDriver = neo4jDriver;
     this.queryConfig = QueryConfig.builder().withDatabase(neo4jConfig.database()).build();
     this.neo4jDriver.verifyConnectivity();
@@ -46,8 +36,6 @@ public final class Neo4jRagRepository implements AutoCloseable {
     execute("MATCH (c:Chapter2Chunk) DETACH DELETE c", Map.of());
     execute("MATCH (m:RagIndexMetadata) WHERE m.indexName = $indexName DELETE m", Map.of("indexName", vectorIndex));
   }
-
-
 
   public void awaitIndex(String indexName) {
     execute("CALL db.awaitIndex($indexName, 300)", Map.of("indexName", safeIdentifier(indexName)));
@@ -257,11 +245,6 @@ public final class Neo4jRagRepository implements AutoCloseable {
     } else {
       throw new IllegalArgumentException("Unsafe identifier: " + identifier);
     }
-  }
-
-  @Override
-  public void close() {
-    neo4jDriver.close();
   }
 
   public record StoredChunk(String text, List<Double> embeddings) {}

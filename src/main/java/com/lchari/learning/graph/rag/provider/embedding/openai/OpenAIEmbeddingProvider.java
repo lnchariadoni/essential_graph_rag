@@ -1,4 +1,4 @@
-package com.lchari.learning.graph.rag.provider.embedding.openAI;
+package com.lchari.learning.graph.rag.provider.embedding.openai;
 
 import com.lchari.learning.graph.rag.provider.embedding.EmbeddingProvider;
 import com.openai.client.OpenAIClient;
