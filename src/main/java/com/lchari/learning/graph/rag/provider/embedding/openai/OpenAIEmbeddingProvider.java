@@ -22,24 +22,28 @@ public class OpenAIEmbeddingProvider implements EmbeddingProvider {
         return List.of();
       }
 
-      EmbeddingCreateParams params = EmbeddingCreateParams.builder()
-          .model(model)
-          .inputOfArrayOfStrings(texts)
-          .build();
+      try {
+        EmbeddingCreateParams params = EmbeddingCreateParams.builder()
+            .model(model)
+            .inputOfArrayOfStrings(texts)
+            .build();
 
-      return openAIClient
-          .embeddings()
-          .create(params)
-          .data()
-          .stream()
-          .sorted(Comparator.comparingLong(Embedding::index))
-          .map(embedding ->
-              embedding
-                  .embedding()
-                  .stream()
-                  .map(Float::doubleValue)
-                  .toList()
-          )
-          .toList();
+        return openAIClient
+            .embeddings()
+            .create(params)
+            .data()
+            .stream()
+            .sorted(Comparator.comparingLong(Embedding::index))
+            .map(embedding ->
+                embedding
+                    .embedding()
+                    .stream()
+                    .map(Float::doubleValue)
+                    .toList()
+            )
+            .toList();
+      } catch (Throwable t) {
+        return List.of();
+      }
     }
 }
