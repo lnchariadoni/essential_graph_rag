@@ -7,17 +7,21 @@ import static org.mockito.Mockito.*;
 import com.lchari.learning.graph.rag.model.ChatMessage;
 import io.github.ollama4j.Ollama;
 import io.github.ollama4j.exceptions.OllamaException;
+import io.github.ollama4j.models.chat.OllamaChatMessageRole;
+import io.github.ollama4j.models.chat.OllamaChatRequest;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class OllamaChatProviderTest {
 
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Ollama ollama;
 
     private OllamaChatProvider provider;
@@ -36,18 +40,14 @@ class OllamaChatProviderTest {
 
         String expectedResponse = "Hi there!";
         
-        Ollama ollamaDeepMock = mock(Ollama.class, RETURNS_DEEP_STUBS);
-        
-        when(ollamaDeepMock.chat(any(), any())
+        when(ollama.chat(any(), any())
             .getResponseModel()
             .getMessage()
             .getResponse())
             .thenReturn(expectedResponse);
 
-        OllamaChatProvider providerWithDeepMock = new OllamaChatProvider(ollamaDeepMock, "llama3");
-
         // Act
-        String result = providerWithDeepMock.chat(messages);
+        String result = provider.chat(messages);
 
         // Assert
         assertEquals(expectedResponse, result);
@@ -67,5 +67,38 @@ class OllamaChatProviderTest {
 
         // Assert
         assertEquals("Caught exception while calling Ollama API: Connection failed", result);
+    }
+
+    @Test
+    void shouldMapAllRolesToTHeMatchingOllamaMessageRole() throws OllamaException {
+        List<ChatMessage> messages = List.of(
+            ChatMessage.system("You are a helpful assistnat"),
+            ChatMessage.user("What is X?"),
+            ChatMessage.assistant("X is Y")
+        );
+
+        when(ollama.chat(any(), any())
+            .getResponseModel()
+            .getMessage()
+            .getResponse())
+            .thenReturn("ok");
+
+
+      ArgumentCaptor<OllamaChatRequest> requestCaptor = ArgumentCaptor.forClass(OllamaChatRequest.class);
+
+      provider.chat(messages);
+
+      verify(ollama, atLeastOnce()).chat(requestCaptor.capture(), any());
+      var sentMessages = requestCaptor.getValue().getMessages();
+      assertEquals(3, sentMessages.size());
+      assertEquals(OllamaChatMessageRole.SYSTEM, sentMessages.get(0).getRole());
+      assertEquals(OllamaChatMessageRole.USER, sentMessages.get(1).getRole());
+      assertEquals(OllamaChatMessageRole.ASSISTANT, sentMessages.get(2).getRole());
+
+      assertEquals(messages.get(0).content(), sentMessages.get(0).getResponse());
+    assertEquals(messages.get(1).content(), sentMessages.get(1).getResponse());
+    assertEquals(messages.get(2).content(), sentMessages.get(2).getResponse());
+
+
     }
 }

@@ -59,7 +59,7 @@ public class Chapter2 {
     String vectorAnswer = answerQuestion(chatProvider, question, vectorEmbeddingResults);
     logger.info("Answer to question: {} \nMethod: Using vector results. \nResponse:{}\n", question, vectorAnswer);
 
-    List<RetrievedChunk> hybridResults = neo4jRagRepository.hybridSeach(
+    List<RetrievedChunk> hybridResults = neo4jRagRepository.hybridSearch(
         appConfig.chapter2Config().vectorIndex(),
         appConfig.chapter2Config().fulltextIndex(),
         questionEmbedding,
