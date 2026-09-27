@@ -13,8 +13,10 @@ public record AppConfig(
     Chapter2Config chapter2Config) {
 
   public static AppConfig load() {
-    Config config = ConfigFactory.load();
+    return load(ConfigFactory.load());
+  }
 
+  public static AppConfig load(Config config) {
     OllamaConfig ollamaConfig = OllamaConfig.from(config.getConfig("providers.ollama"));
     OpenAIConfig openAIConfig = OpenAIConfig.from(config.getConfig("providers.openai"));
 

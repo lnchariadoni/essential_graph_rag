@@ -85,9 +85,9 @@ public final class Neo4jRagRepository {
     String cypher = """
         MATCH (m:RagIndexMetadata {indexName: $indexName})
         RETURN m.indexName AS indexName,
-          m.profile AS profile, 
-          m.provider AS provider, 
-          m.model AS model, 
+          m.profile AS profile,
+          m.provider AS provider,
+          m.model AS model,
           m.dimensions AS dimensions
         """;
 
@@ -97,19 +97,19 @@ public final class Neo4jRagRepository {
       return null;
     }
 
-    Record record = records.getFirst();
+    Record result = records.getFirst();
     return new EmbeddingIndexMetadata(
-        record.get("indexName").asString(),
-        record.get("profile").asString(),
-        record.get("provider").asString(),
-        record.get("model").asString(),
-        record.get("dimensions").asInt()
+        result.get("indexName").asString(),
+        result.get("profile").asString(),
+        result.get("provider").asString(),
+        result.get("model").asString(),
+        result.get("dimensions").asInt()
     );
   }
 
   public List<RetrievedChunk> vectorSearch(String indexName, List<Double> queryEmbedding, int topK) {
     String cypher = """
-        CALL db.index.vector.queryNodes($indexName, $topK, $queryEmbedding) 
+        CALL db.index.vector.queryNodes($indexName, $topK, $queryEmbedding)
         YIELD node AS hit, score
         RETURN hit.index AS index, hit.text AS text, score
         ORDER BY score DESC
@@ -119,17 +119,20 @@ public final class Neo4jRagRepository {
         "topK", topK,
         "queryEmbedding", queryEmbedding))
         .stream()
-        .map(record -> new RetrievedChunk(
-            record.get("index").asInt(),
-            record.get("text").asString(),
-            record.get("score").asDouble()))
+        .map(neo4jRecord -> new RetrievedChunk(
+            neo4jRecord.get("index").asInt(),
+            neo4jRecord.get("text").asString(),
+            neo4jRecord.get("score").asDouble()))
         .toList();
   }
 
   // Chapter2Chunk, text
   public void createFulltextIndex(String indexName, String label, String property) {
     String safeIndexName = safeIdentifier(indexName);
-    String cypher = String.format("CREATE FULLTEXT INDEX %s IF NOT EXISTS FOR (c:%s) ON EACH [c.%s]", safeIndexName, label, property);
+    String safeLabel = safeIdentifier(label);
+    String safeProperty = safeIdentifier(property);
+
+    String cypher = String.format("CREATE FULLTEXT INDEX %s IF NOT EXISTS FOR (c:%s) ON EACH [c.%s]", safeIndexName, safeLabel, safeProperty);
 
     execute(cypher, Map.of());
   }
@@ -137,6 +140,9 @@ public final class Neo4jRagRepository {
   // Chapter2Chunk, embedding
   public void createVectorIndex(String indexName, String label, String property, int dimensions) {
     String safeIndexName = safeIdentifier(indexName);
+    String safeLabel = safeIdentifier(label);
+    String safeProperty = safeIdentifier(property);
+
     String cypher = """
         CREATE VECTOR INDEX %s IF NOT EXISTS
         FOR (c:%s)
@@ -145,16 +151,16 @@ public final class Neo4jRagRepository {
         `vector.dimensions`: %d,
         `vector.similarity_function`: 'cosine'
         }}
-        """.formatted(safeIndexName, label, property, dimensions);
+        """.formatted(safeIndexName, safeLabel, safeProperty, dimensions);
 
     execute(cypher, Map.of());
   }
 
-  public List<RetrievedChunk> hybridSeach(String vectorIndexName,
-                                          String fulltextIndexName,
-                                          List<Double> questionEmbedding,
-                                          String question,
-                                          int topK) {
+  public List<RetrievedChunk> hybridSearch(String vectorIndexName,
+                                           String fulltextIndexName,
+                                           List<Double> questionEmbedding,
+                                           String question,
+                                           int topK) {
     String cypher = """
         CALL {
                 CALL db.index.vector.queryNodes($vectorIndexName, $topK, $questionEmbedding)
@@ -189,10 +195,10 @@ public final class Neo4jRagRepository {
 
     return records
         .stream()
-        .map(record -> new RetrievedChunk(
-            record.get("index").asInt(),
-            record.get("text").asString(),
-            record.get("score").asDouble()))
+        .map(neo4jRecord -> new RetrievedChunk(
+            neo4jRecord.get("index").asInt(),
+            neo4jRecord.get("text").asString(),
+            neo4jRecord.get("score").asDouble()))
         .toList();
   }
 
@@ -208,10 +214,10 @@ public final class Neo4jRagRepository {
       throw new NoSuchElementException("No Chapter2Chunk found with index 0");
     }
 
-    Record record = records.getFirst();
+    Record neo4jRecord = records.getFirst();
     return new StoredChunk(
-        record.get("text").asString(),
-        record.get("embedding").asList(Value::asDouble)
+        neo4jRecord.get("text").asString(),
+        neo4jRecord.get("embedding").asList(Value::asDouble)
     );
   }
 

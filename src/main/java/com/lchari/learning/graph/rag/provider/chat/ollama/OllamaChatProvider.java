@@ -6,8 +6,12 @@ import io.github.ollama4j.Ollama;
 import io.github.ollama4j.models.chat.OllamaChatMessageRole;
 import io.github.ollama4j.models.chat.OllamaChatRequest;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OllamaChatProvider implements ChatProvider {
+  private static final Logger logger = LoggerFactory.getLogger(OllamaChatProvider.class);
+
   private final Ollama ollamaClient;
   private final String model;
 
@@ -26,6 +30,7 @@ public class OllamaChatProvider implements ChatProvider {
       var result = ollamaClient.chat(request.build(), null);
       return result.getResponseModel().getMessage().getResponse();
     } catch (Exception e) { // TODO. handle exception properly
+      logger.error("Ollama chat call failed", e);
       return "Caught exception while calling Ollama API: " + e.getMessage();
     }
 

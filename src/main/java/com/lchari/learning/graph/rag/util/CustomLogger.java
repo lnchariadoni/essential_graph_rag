@@ -11,7 +11,7 @@ public final class CustomLogger {
 
   private CustomLogger() {}
 
-  public static void printAppConfig(AppConfig config) {
+  public static void logAppConfig(AppConfig config) {
     String embedding = String.format(
         "Embedding: profile=%s, provider=%s, model=%s",
         config.embeddingModelProfile().name(), config.embeddingModelProfile().provider(), config.embeddingModelProfile().model());

@@ -6,8 +6,12 @@ import com.openai.models.embeddings.Embedding;
 import com.openai.models.embeddings.EmbeddingCreateParams;
 import java.util.Comparator;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OpenAIEmbeddingProvider implements EmbeddingProvider {
+  private static final Logger logger = LoggerFactory.getLogger(OpenAIEmbeddingProvider.class);
+
   private final OpenAIClient openAIClient;
     private final String model;
 
@@ -42,7 +46,8 @@ public class OpenAIEmbeddingProvider implements EmbeddingProvider {
                     .toList()
             )
             .toList();
-      } catch (Throwable t) {
+      } catch (Exception e) {
+        logger.error("OpenAI embedding call failed", e);
         return List.of();
       }
     }
